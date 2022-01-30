@@ -1,0 +1,24 @@
+{
+  "name": "amc-amazing",
+  "version": "1.0.0",
+  "description": "Extrapolates and presents data from usher schedules",
+  "main": "index.js",
+  "scripts": {
+    "start": "node .",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/NeonWizard/amc-amazing.git"
+  },
+  "author": "Spooky <averagewizard13@gmail.com>",
+  "license": "GPL-3.0-or-later",
+  "bugs": {
+    "url": "https://github.com/NeonWizard/amc-amazing/issues"
+  },
+  "homepage": "https://github.com/NeonWizard/amc-amazing#readme",
+  "dependencies": {
+    "ocr-space-api-wrapper": "^2.1.0",
+    "sharp": "^0.29.3"
+  }
+}

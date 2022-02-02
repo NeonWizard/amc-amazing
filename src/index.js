@@ -8,8 +8,8 @@ const { shuffleArray } = require('./utils.js');
 
 const client = new Client({ intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MEMBERS, Intents.FLAGS.GUILD_PRESENCES ] });
 
-const commandFiles = fs.readdirSync('src/commands').filter(file => file.endsWith('.js'))
-const commands = []
+const commandFiles = fs.readdirSync('src/commands').filter(file => file.endsWith('.js'));
+const commands = [];
 
 // Creating a collection for commands in client
 client.commands = new Collection();
@@ -28,7 +28,7 @@ client.once('ready', () => {
   // -- build REST connection for registering commands
   const CLIENT_ID = client.user.id;
   const rest = new REST({
-      version: '9'
+    version: '9',
   }).setToken(config.BOT_TOKEN);
 
   // -- register commands
@@ -36,7 +36,8 @@ client.once('ready', () => {
     try {
       await rest.put(Routes.applicationGuildCommands(CLIENT_ID, config.GUILD_ID), { body: commands });
       console.log('Successfully registered application commands.');
-    } catch (error) {
+    }
+    catch (error) {
       if (error) console.error(error);
     }
   })();
@@ -47,8 +48,8 @@ client.once('ready', () => {
     'writing a negative review on Matrix: Resurrections',
     'glonk',
     'a wholesome movie',
-    'Justin Bieber - Yummy'
-  ]
+    'Justin Bieber - Yummy',
+  ];
   let activitiesQueue = shuffleArray([...activities]);
 
   const cycleActivity = () => {
@@ -58,11 +59,11 @@ client.once('ready', () => {
 
     const activity = activitiesQueue.pop();
     client.user.setActivity(activity);
-  }
+  };
 
   cycleActivity(); // run once at start
   setInterval(cycleActivity, 1000 * 60);
-})
+});
 
 // ---------------------------------------------------------------------------
 // onInteractionCreate
@@ -74,7 +75,8 @@ client.on('interactionCreate', async interaction => {
 
   try {
     await command.execute(interaction);
-  } catch (error) {
+  }
+  catch (error) {
     if (error) console.error(error);
     await interaction.reply({ content: 'There was an error while executing this command!', ephemeral: true });
   }

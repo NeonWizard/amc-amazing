@@ -4,6 +4,7 @@ const { Routes } = require('discord-api-types/v9');
 const { Client, Intents, Collection } = require('discord.js');
 
 const config = require('./config.js');
+const { shuffleArray } = require('./utils.js');
 
 const client = new Client({ intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MEMBERS, Intents.FLAGS.GUILD_PRESENCES ] });
 
@@ -24,12 +25,13 @@ for (const file of commandFiles) {
 client.once('ready', () => {
   console.log('Ready!');
 
-  // Registering the commands in the client
+  // -- build REST connection for registering commands
   const CLIENT_ID = client.user.id;
   const rest = new REST({
       version: '9'
   }).setToken(config.BOT_TOKEN);
 
+  // -- register commands
   (async () => {
     try {
       await rest.put(Routes.applicationGuildCommands(CLIENT_ID, config.GUILD_ID), { body: commands });
@@ -38,6 +40,28 @@ client.once('ready', () => {
       if (error) console.error(error);
     }
   })();
+
+  // -- create presence update cycle
+  const activities = [
+    'having a popcorn fight',
+    'writing a negative review on Matrix: Resurrections',
+    'glonk',
+    'a wholesome movie',
+    'Justin Bieber - Yummy'
+  ]
+  let activitiesQueue = shuffleArray([...activities]);
+
+  const cycleActivity = () => {
+    if (activitiesQueue.length <= 0) {
+      activitiesQueue = shuffleArray([...activities]);
+    }
+
+    const activity = activitiesQueue.pop();
+    client.user.setActivity(activity);
+  }
+
+  cycleActivity(); // run once at start
+  setInterval(cycleActivity, 1000 * 60);
 })
 
 // ---------------------------------------------------------------------------

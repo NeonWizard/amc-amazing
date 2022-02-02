@@ -6,7 +6,7 @@ const { Client, Intents, Collection } = require('discord.js');
 
 const config = require('./config.js');
 
-const client = new Client({ intents: [Intents.FLAGS.GUILDS] });
+const client = new Client({ intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MEMBERS, Intents.FLAGS.GUILD_PRESENCES ] });
 
 const commandFiles = fs.readdirSync('src/commands').filter(file => file.endsWith('.js'))
 const commands = []
@@ -21,7 +21,7 @@ for (const file of commandFiles) {
 }
 
 // ---------------------------------------------------------------------------
-
+// onReady
 client.once('ready', () => {
   console.log('Ready!');
 
@@ -41,6 +41,8 @@ client.once('ready', () => {
   })();
 })
 
+// ---------------------------------------------------------------------------
+// onInteractionCreate
 client.on('interactionCreate', async interaction => {
   if (!interaction.isCommand()) return;
 

@@ -1,24 +1,58 @@
 const axios = require('axios');
-const { Client, Intents } = require('discord.js');
+const fs = require('fs');
+const { REST } = require('@discordjs/rest');
+const { Routes } = require('discord-api-types/v9');
+const { Client, Intents, Collection } = require('discord.js');
 
-require('dotenv').config();
+const config = require('./config.js');
 
 const client = new Client({ intents: [Intents.FLAGS.GUILDS] });
 
-const config = {
-  API_KEY: process.env.API_KEY,
-  BOT_TOKEN: process.env.BOT_TOKEN,
-  TEST_CHANNEL_ID: "938219521683124235"
-}
+const commandFiles = fs.readdirSync('src/commands').filter(file => file.endsWith('.js'))
+const commands = []
 
-if (!config.API_KEY || !config.BOT_TOKEN) {
-  throw "API_KEY and BOT_TOKEN environment variables must be set!";
+// Creating a collection for commands in client
+client.commands = new Collection();
+
+for (const file of commandFiles) {
+  const command = require(`./commands/${file}`);
+  commands.push(command.data.toJSON());
+  client.commands.set(command.data.name, command);
 }
 
 // ---------------------------------------------------------------------------
 
 client.once('ready', () => {
-  console.log('ready');
+  console.log('Ready!');
+
+  // Registering the commands in the client
+  const CLIENT_ID = client.user.id;
+  const rest = new REST({
+      version: '9'
+  }).setToken(config.BOT_TOKEN);
+
+  (async () => {
+    try {
+      await rest.put(Routes.applicationGuildCommands(CLIENT_ID, config.GUILD_ID), { body: commands });
+      console.log('Successfully registered application commands.');
+    } catch (error) {
+      if (error) console.error(error);
+    }
+  })();
 })
+
+client.on('interactionCreate', async interaction => {
+  if (!interaction.isCommand()) return;
+
+  const command = client.commands.get(interaction.commandName);
+  if (!command) return;
+
+  try {
+    await command.execute(interaction);
+  } catch (error) {
+    if (error) console.error(error);
+    await interaction.reply({ content: 'There was an error while executing this command!', ephemeral: true });
+  }
+});
 
 client.login(config.BOT_TOKEN);
